@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>西津野渡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --sky-top:#4facfe;--sky-mid:#87c5f8;--sky-bot:#c4e0f9;
+  --mountain-far:#7eb8a8;--mountain-mid:#5a9e7e;--mountain-near:#3d7a5f;
+  --water:#5bb8d4;--water-deep:#3a8fb7;
+  --sun:#ffd54f;--sun-glow:rgba(255,213,79,0.35);
+  --card:rgba(255,255,255,0.82);--card-h:rgba(255,255,255,0.92);
+  --primary:#2e7d6e;--primary-h:#3a9e8a;--primary-light:rgba(46,125,110,0.12);--primary-glow:rgba(46,125,110,0.18);
+  --accent:#d4840a;--accent-h:#e6950f;--accent-light:rgba(212,132,10,0.12);--accent-glow:rgba(212,132,10,0.18);
+  --danger:#d84040;--success:#2e7d6e;--warn:#d4840a;
+  --text:#1a3a2a;--text2:#5a7a6a;--text3:#8aa89a;
+  --border:rgba(46,125,110,0.15);--border2:rgba(0,0,0,0.06);
+  --shadow:rgba(46,125,110,0.08);--shadow2:rgba(0,0,0,0.06);
+  --r:20px;--r2:14px;
+  --font-display:'ZCOOL XiaoWei','STKaiti','KaiTi',serif;
+  --font-ui:'Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+html,body{height:100%;overflow-x:hidden}
+body{
+  font-family:var(--font-ui);background:var(--sky-mid);color:var(--text);
+  min-height:100vh;position:relative;
+}
+
+/* ====== SUNNY LANDSCAPE BACKGROUND ====== */
+.landscape-bg{
+  position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:linear-gradient(180deg,#3a9bdc 0%,#5db8e8 15%,#8fd4f5 30%,#c4e4fa 50%,#d8eee0 60%,#a8d4b8 72%,#7ebfa0 82%,#5aaa82 92%,#3d7a5f 100%);
+}
+
+/* Sun */
+.sun{
+  position:absolute;top:5%;right:12%;width:80px;height:80px;border-radius:50%;
+  background:radial-gradient(circle,#fff8e1 0%,#ffd54f 30%,#ffb300 70%,transparent 100%);
+  box-shadow:0 0 60px 20px rgba(255,213,79,0.4),0 0 120px 60px rgba(255,183,77,0.2);
+}
+.sun::after{
+  content:'';position:absolute;inset:-40px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,213,79,0.15),transparent 70%);
+}
+
+/* Sun rays - 去掉旋转动画 */
+.sun-rays{
+  position:absolute;top:5%;right:12%;width:80px;height:80px;
+}
+.sun-rays::before,.sun-rays::after{
+  content:'';position:absolute;inset:-120px;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent,rgba(255,213,79,0.06),transparent,rgba(255,213,79,0.06),transparent,rgba(255,213,79,0.06),transparent,rgba(255,213,79,0.06),transparent);
+}
+.sun-rays::after{transform:rotate(45deg)}
+
+/* Clouds - 去掉飘动动画 */
+.cloud{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,255,255,0.7),transparent 70%);
+  filter:blur(8px);pointer-events:none;
+}
+.cloud-1{width:280px;height:70px;top:10%;left:20%}
+.cloud-2{width:350px;height:80px;top:18%;left:40%}
+.cloud-3{width:200px;height:50px;top:8%;left:65%}
+.cloud-4{width:300px;height:65px;top:22%;left:80%}
+.cloud-5{width:180px;height:45px;top:14%;left:50%}
+
+/* Mountain SVG */
+.landscape-bg svg{position:absolute;bottom:0;left:0;width:100%;pointer-events:none}
+
+/* Water reflection - 去掉水波动画 */
+.water-reflect{
+  position:absolute;bottom:0;left:0;width:100%;height:18%;
+  background:linear-gradient(180deg,rgba(91,184,212,0.3),rgba(58,143,183,0.5));
+}
+.water-ripple{
+  position:absolute;bottom:3%;left:0;width:100%;height:12%;
+  background:repeating-linear-gradient(90deg,transparent,rgba(255,255,255,0.04) 2px,transparent 4px);
+}
+
+/* Floating petals - 去掉花瓣动画 */
+.petal{
+  position:absolute;width:6px;height:6px;border-radius:50% 0 50% 0;
+  pointer-events:none;opacity:0.7;
+}
+
+/* ====== LAYOUT ====== */
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* Header */
+.hd{
+  background:rgba(255,255,255,0.75);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+  padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 16px var(--shadow2);
+}
+.hd h1{
+  font-family:var(--font-display);font-size:26px;font-weight:400;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;letter-spacing:4px;
+}
+.hd .u{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px}
+.hd .u .dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:all .3s}
+.hd .u.on .dot{background:var(--success);box-shadow:0 0 8px var(--primary-glow)}
+
+/* Tab Nav */
+.tabs{
+  display:flex;gap:0;background:var(--card);
+  border-radius:var(--r2);margin-bottom:16px;overflow:hidden;
+  border:1px solid var(--border2);
+  box-shadow:0 2px 12px var(--shadow);
+}
+.tab{
+  flex:1;height:46px;display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:14px;color:var(--text2);cursor:pointer;transition:all .3s;
+  position:relative;font-weight:400;
+}
+.tab:hover{color:var(--primary);background:var(--primary-light)}
+.tab.on{
+  color:var(--primary);background:var(--primary-light);font-weight:500;
+}
+.tab.on::after{
+  content:'';position:absolute;bottom:0;left:20%;right:20%;height:3px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-h));
+  border-radius:3px;
+}
+
+/* Content */
+.ct{max-width:800px;margin:0 auto;padding:16px;width:100%;flex:1}
+
+/* Card - 去掉入场动画 */
+.cd{
+  background:var(--card);border-radius:var(--r);padding:20px;margin-bottom:16px;
+  border:1px solid var(--border2);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 4px 24px var(--shadow),0 1px 0 rgba(255,255,255,0.8) inset;
+  transition:transform .3s,box-shadow .3s;
+}
+.cd:hover{box-shadow:0 8px 32px var(--shadow),0 1px 0 rgba(255,255,255,0.9) inset;transform:translateY(-1px)}
+
+.cd-t{
+  font-family:var(--font-display);font-size:22px;font-weight:400;
+  margin-bottom:16px;display:flex;align-items:center;gap:8px;
+  color:var(--primary);letter-spacing:2px;
+}
+.cd-t .icon{font-size:22px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1))}
+
+/* ====== LOGIN ====== */
+.login-box{max-width:360px;margin:0 auto;text-align:center;padding:24px 0}
+.login-box .logo-wrap{
+  width:88px;height:88px;margin:0 auto 20px;
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+.login-box .logo-wrap svg{width:100%;height:100%}
+.login-box .logo-glow{
+  position:absolute;inset:-14px;border-radius:50%;
+  background:radial-gradient(circle,var(--sun-glow),transparent 70%);
+}
+.login-box h2{
+  font-family:var(--font-display);font-size:28px;font-weight:400;
+  margin-bottom:8px;letter-spacing:5px;
+  color:var(--primary);
+}
+.login-box .sub{font-size:13px;color:var(--text3);margin-bottom:28px;letter-spacing:2px}
+.field{margin-bottom:16px;text-align:left}
+.field label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;font-weight:400;letter-spacing:1px}
+.field input{
+  width:100%;height:48px;border:1.5px solid var(--border2);border-radius:var(--r2);
+  padding:0 16px;font-size:15px;outline:none;transition:all .3s;
+  background:rgba(255,255,255,0.7);color:var(--text);font-family:var(--font-ui);
+}
+.field input::placeholder{color:var(--text3)}
+.field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow);background:#fff}
+.remember{
+  display:flex;align-items:center;gap:8px;margin-bottom:20px;
+  font-size:13px;color:var(--text2);cursor:pointer;
+}
+.remember input{width:16px;height:16px;cursor:pointer;accent-color:var(--primary)}
+
+/* ====== BUTTONS ====== */
+.btn{
+  height:48px;padding:0 24px;border:none;border-radius:var(--r2);
+  font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  white-space:nowrap;font-family:var(--font-ui);position:relative;overflow:hidden;
+}
+.btn:active{transform:scale(0.97)}
+.bp{
+  background:linear-gradient(135deg,var(--primary),var(--primary-h));color:#fff;font-weight:600;
+  box-shadow:0 4px 16px var(--primary-glow);
+}
+.bp:hover{box-shadow:0 6px 24px rgba(46,125,110,0.3);filter:brightness(1.05)}
+.bp:disabled{background:#a0c4bc;color:#d0e8e2;box-shadow:none;cursor:not-allowed}
+.bs{
+  background:linear-gradient(135deg,var(--accent),var(--accent-h));color:#fff;font-weight:600;
+  box-shadow:0 4px 16px var(--accent-glow);
+}
+.bs:hover{box-shadow:0 6px 24px rgba(212,132,10,0.3);filter:brightness(1.05)}
+.bs:disabled{background:#c4a878;color:#e8dcc8;box-shadow:none;cursor:not-allowed}
+.bo{
+  background:rgba(255,255,255,0.6);border:1.5px solid var(--border);color:var(--text2);
+}
+.bo:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.bsm{height:36px;padding:0 14px;font-size:13px}
+.btn-block{width:100%}
+
+/* ====== SCAN OVERLAY (FULLSCREEN) ====== */
+.scan-overlay{
+  position:fixed;inset:0;z-index:1000;background:#000;
+  display:none;flex-direction:column;
+}
+.scan-overlay.on{display:flex}
+.scan-overlay video{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+}
+.scan-overlay canvas{display:none}
+.scan-frame{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:65vmin;height:65vmin;border:2.5px solid var(--primary);border-radius:16px;
+  box-shadow:0 0 0 9999px rgba(0,0,0,0.55),0 0 30px var(--primary-glow);
+  pointer-events:none;
+}
+.scan-hint{
+  position:absolute;bottom:15%;left:0;width:100%;text-align:center;
+  color:#fff;font-size:14px;letter-spacing:1px;
+  text-shadow:0 1px 4px rgba(0,0,0,0.6);
+  pointer-events:none;
+}
+.scan-close{
+  position:absolute;top:16px;right:16px;
+  width:40px;height:40px;border-radius:50%;border:none;
+  background:rgba(0,0,0,0.5);color:#fff;font-size:20px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.scan-close:active{background:rgba(0,0,0,0.7)}
+.sc{display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap}
+.ir{display:flex;gap:8px;margin-top:12px}
+.ir input{
+  flex:1;height:48px;border:1.5px solid var(--border2);border-radius:var(--r2);
+  padding:0 16px;font-size:16px;outline:none;transition:all .3s;
+  background:rgba(255,255,255,0.7);color:var(--text);font-family:var(--font-ui);
+}
+.ir input::placeholder{color:var(--text3)}
+.ir input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow);background:#fff}
+.cr{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.cr label{font-size:13px;color:var(--text2);white-space:nowrap}
+.cr select,.cr input{
+  height:38px;border:1.5px solid var(--border2);border-radius:10px;
+  padding:0 10px;font-size:14px;outline:none;min-width:100px;
+  background:rgba(255,255,255,0.7);color:var(--text);font-family:var(--font-ui);
+}
+.cr select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a7a6a' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.cr select option{background:#fff;color:var(--text)}
+.cr select:focus,.cr input:focus{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-glow)}
+
+/* ====== RESULTS ====== */
+.rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.rh .oi{font-size:13px;color:var(--text2)}
+.sar{
+  display:flex;align-items:center;gap:8px;padding:10px 0;
+  border-bottom:1px solid var(--border2);margin-bottom:8px;
+}
+.sar label{font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--text2)}
+.sar input[type=checkbox]{accent-color:var(--primary);width:18px;height:18px}
+.tl{max-height:400px;overflow-y:auto}
+.tl::-webkit-scrollbar{width:4px}
+.tl::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+.ti{
+  display:flex;align-items:center;gap:12px;padding:12px 0;
+  border-bottom:1px solid rgba(46,125,110,0.06);
+}
+.ti:last-child{border-bottom:none}
+.ti input[type=checkbox]{width:20px;height:20px;cursor:pointer;flex-shrink:0;accent-color:var(--primary)}
+.tf{flex:1;min-width:0}
+.tn{font-family:var(--font-display);font-size:17px;letter-spacing:1px;color:var(--text)}
+.tm{font-size:12px;color:var(--text2);margin-top:4px;display:flex;flex-wrap:wrap;gap:8px}
+.ts{
+  font-size:12px;padding:3px 10px;border-radius:20px;font-weight:500;
+  white-space:nowrap;letter-spacing:0.5px;
+}
+.s0{background:var(--accent-light);color:var(--accent);border:1px solid rgba(212,132,10,0.3)}
+.s1{background:var(--primary-light);color:var(--primary);border:1px solid rgba(46,125,110,0.25)}
+.s2{background:rgba(46,125,110,0.12);color:var(--primary);border:1px solid rgba(46,125,110,0.3)}
+.s3{background:rgba(216,64,64,0.1);color:var(--danger);border:1px solid rgba(216,64,64,0.25)}
+.s4{background:rgba(120,80,200,0.1);color:#7b52c0;border:1px solid rgba(120,80,200,0.25)}
+.s5{background:rgba(0,0,0,0.04);color:var(--text3);border:1px solid rgba(0,0,0,0.08)}
+
+/* Bottom bar */
+.bb{
+  position:sticky;bottom:0;
+  background:rgba(255,255,255,0.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  padding:14px 20px;
+  box-shadow:0 -2px 16px var(--shadow2);
+  display:flex;align-items:center;justify-content:space-between;
+  border-radius:var(--r) var(--r) 0 0;
+  border-top:1px solid var(--border2);
+}
+.slc{font-size:14px;color:var(--text2)}.slc strong{color:var(--accent);font-size:20px;font-weight:700}
+
+/* ====== HISTORY ====== */
+.hf{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.hf .fg{display:flex;flex-direction:column;gap:4px}
+.hf .fg label{font-size:11px;color:var(--text2);letter-spacing:0.5px}
+.hf input[type=date],.hf input[type=text]{
+  height:36px;border:1.5px solid var(--border2);border-radius:10px;
+  padding:0 10px;font-size:13px;outline:none;
+  background:rgba(255,255,255,0.7);color:var(--text);font-family:var(--font-ui);
+  transition:border-color .3s,box-shadow .3s;
+}
+.hf input:focus{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-glow)}
+.hf input[type=date]::-webkit-calendar-picker-indicator{filter:none}
+.hf .btn{height:36px;padding:0 16px;font-size:13px}
+
+.hstats{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.hstat{
+  flex:1;min-width:100px;padding:14px;border-radius:var(--r2);
+  background:linear-gradient(135deg,rgba(255,255,255,0.6),rgba(255,255,255,0.3));
+  border:1px solid var(--border2);text-align:center;transition:all .3s;
+  box-shadow:0 2px 8px var(--shadow);
+}
+.hstat:hover{transform:translateY(-2px);box-shadow:0 4px 16px var(--shadow)}
+.hstat .sv{font-family:var(--font-display);font-size:30px;color:var(--primary);line-height:1.2}
+.hstat .sl{font-size:11px;color:var(--text2);margin-top:4px;letter-spacing:0.5px}
+.hstat.accent .sv{color:var(--accent)}
+
+.hl{max-height:500px;overflow-y:auto}
+.hl::-webkit-scrollbar{width:4px}
+.hl::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+.hi{
+  display:flex;gap:12px;padding:14px 0;
+  border-bottom:1px solid rgba(46,125,110,0.06);
+  align-items:flex-start;
+}
+.hi:last-child{border-bottom:none}
+.hi-left{
+  width:42px;height:42px;border-radius:12px;
+  background:var(--primary-light);border:1px solid rgba(46,125,110,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.hi-body{flex:1;min-width:0}
+.hi-name{font-size:14px;font-weight:500;margin-bottom:4px;color:var(--text)}
+.hi-meta{font-size:12px;color:var(--text2);display:flex;flex-wrap:wrap;gap:6px 12px}
+.hi-time{font-size:11px;color:var(--text3);margin-top:6px}
+
+.hp{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 0;font-size:13px;color:var(--text2);
+}
+.hp button{
+  background:rgba(255,255,255,0.6);border:1px solid var(--border2);color:var(--text2);
+  padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;
+  transition:all .2s;font-family:var(--font-ui);
+}
+.hp button:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.hp button:disabled{opacity:0.3;cursor:not-allowed}
+.hp .pn{color:var(--primary);font-weight:600}
+
+.dir-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500}
+.dir-in{background:var(--primary-light);color:var(--primary);border:1px solid rgba(46,125,110,0.25)}
+.dir-out{background:var(--accent-light);color:var(--accent);border:1px solid rgba(212,132,10,0.25)}
+
+/* Toast */
+.toast{
+  position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-120px);
+  background:var(--card);padding:14px 28px;border-radius:var(--r2);
+  box-shadow:0 8px 32px rgba(0,0,0,0.12);font-size:14px;z-index:9999;
+  transition:transform .4s cubic-bezier(0.34,1.56,0.64,1);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--border2);color:var(--text);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{border-left:4px solid var(--success)}
+.toast.err{border-left:4px solid var(--danger)}
+.toast.wrn{border-left:4px solid var(--warn)}
+
+.empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty .ic{font-size:56px;margin-bottom:12px}
+.empty p{font-size:14px}
+
+.hid{display:none!important}
+.logout{font-size:12px;color:var(--text3);cursor:pointer;margin-left:8px;text-decoration:underline;text-underline-offset:3px}
+.logout:hover{color:var(--primary)}
+
+/* Success burst - 去掉爆发动画 */
+.success-burst{
+  position:fixed;inset:0;z-index:9998;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.success-burst .ring{
+  width:100px;height:100px;border-radius:50%;
+  border:3px solid var(--success);
+}
+
+@media(max-width:480px){
+  .ct{padding:10px}.cd{padding:14px}.cr{gap:8px}
+  .hd h1{font-size:22px}.login-box h2{font-size:24px}
+  .hstats{gap:8px}.hstat .sv{font-size:24px}
+  .sun{width:50px;height:50px;top:3%;right:8%}
+}
+</style>
+</head>
+<body>
+
+<!-- Sunny Landscape Background -->
+<div class="landscape-bg">
+  <div class="sun"></div>
+  <div class="sun-rays"></div>
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <div class="cloud cloud-4"></div>
+  <div class="cloud cloud-5"></div>
+  <div class="cloud cloud-1"></div>
+  <svg viewBox="0 0 1440 400" preserveAspectRatio="none" style="height:50%">
+    <!-- Far mountains - misty blue-green -->
+    <path d="M0,400 L0,220 Q80,140 180,180 Q280,220 380,160 Q480,100 600,150 Q720,200 820,130 Q920,60 1050,120 Q1180,180 1280,140 Q1380,100 1440,150 L1440,400Z" fill="rgba(126,184,168,0.5)"/>
+    <!-- Mid mountains - rich green -->
+    <path d="M0,400 L0,270 Q120,190 260,230 Q400,270 520,210 Q640,150 780,200 Q920,250 1060,190 Q1200,130 1340,180 L1440,160 L1440,400Z" fill="rgba(90,158,126,0.7)"/>
+    <!-- Near mountains - deep green -->
+    <path d="M0,400 L0,310 Q160,250 320,280 Q480,310 640,270 Q800,230 960,260 Q1120,290 1280,250 Q1380,230 1440,260 L1440,400Z" fill="rgba(61,122,95,0.85)"/>
+    <!-- Shore -->
+    <path d="M0,400 L0,340 Q200,320 400,335 Q600,350 800,330 Q1000,310 1200,325 Q1350,335 1440,320 L1440,400Z" fill="rgba(46,100,70,0.95)"/>
+  </svg>
+  <div class="water-reflect"></div>
+  <div class="water-ripple"></div>
+</div>
+
+<!-- App -->
+<div class="app">
+  <div class="hd">
+    <h1>西津野渡</h1>
+    <div class="u" id="ui"><span class="dot"></span>未登录</div>
+  </div>
+  <div class="ct">
+
+    <!-- Login Card -->
+    <div class="cd" id="lc">
+      <div class="login-box">
+        <div class="logo-wrap">
+          <div class="logo-glow"></div>
+          <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="44" cy="44" r="42" stroke="url(#lg1)" stroke-width="1.5" fill="rgba(46,125,110,0.06)"/>
+            <path d="M18,58 L28,38 L36,48 L48,28 L58,50 L68,42" stroke="url(#lg1)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14,64 Q24,54 34,60 Q44,66 54,56 Q64,46 74,54 L74,70 L14,70Z" fill="url(#lg2)" opacity="0.7"/>
+            <circle cx="62" cy="22" r="6" fill="url(#lg3)" opacity="0.9"/>
+            <path d="M30,72 Q36,68 42,72 Q48,76 54,72" stroke="var(--water)" stroke-width="1.5" fill="none" opacity="0.5"/>
+            <defs>
+              <linearGradient id="lg1" x1="18" y1="28" x2="68" y2="58"><stop stop-color="#2e7d6e"/><stop offset="1" stop-color="#3a9e8a"/></linearGradient>
+              <linearGradient id="lg2" x1="14" y1="46" x2="74" y2="70"><stop stop-color="#5a9e7e"/><stop offset="1" stop-color="#3d7a5f"/></linearGradient>
+              <linearGradient id="lg3" x1="56" y1="16" x2="68" y2="28"><stop stop-color="#ffd54f"/><stop offset="1" stop-color="#ffb300"/></linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h2>西津野渡</h2>
+        <p class="sub">舟行碧波上 · 人在画中游</p>
+        <div class="field">
+          <label>用户名 / 手机号</label>
+          <input type="text" id="lun" placeholder="请输入用户名" autocomplete="username">
+        </div>
+        <div class="field">
+          <label>密码</label>
+          <input type="password" id="lpw" placeholder="请输入密码" autocomplete="current-password">
+        </div>
+        <label class="remember"><input type="checkbox" id="lrm" checked> 记住我</label>
+        <button class="btn bp btn-block" onclick="doLogin()" id="lbtn">登 录</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main" class="hid">
+      <div class="tabs">
+        <div class="tab on" data-tab="scan" onclick="switchTab('scan')">📷 扫码检票</div>
+        <div class="tab" data-tab="history" onclick="switchTab('history')">📋 核销记录</div>
+      </div>
+
+      <!-- Scan Tab -->
+      <div id="tab-scan">
+        <div class="cd">
+          <div class="cd-t"><span class="icon">📷</span> 扫码检票</div>
+          <div class="sc"><button class="btn bo bsm" onclick="togCam()" id="cb">📷 扫码检票</button></div>
+          <div class="ir">
+            <input type="text" id="ci" placeholder="扫码或输入检票码 / 票号" autocomplete="off">
+            <button class="btn bp" onclick="search()" id="sb">查询</button>
+          </div>
+          <div class="cr">
+            <label>项目:</label><select id="ps"><option value="">加载中...</option></select>
+            <label>方向:</label><select id="ds"><option value="1">进</option><option value="0">出</option></select>
+          </div>
+        </div>
+        <div class="cd hid" id="rc">
+          <div class="rh">
+            <div class="cd-t" style="margin-bottom:0"><span class="icon">🎫</span> 票据列表</div>
+            <div class="oi" id="oinf"></div>
+          </div>
+          <div class="sar"><label><input type="checkbox" id="sa2" onchange="togAll()"> 全选</label></div>
+          <div class="tl" id="tl"></div>
+          <div class="bb">
+            <div class="slc">已选 <strong id="sc2">0</strong> 张</div>
+            <button class="btn bs" onclick="batchV()" id="vb" disabled>批量核销</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div id="tab-history" class="hid">
+        <div class="cd">
+          <div class="cd-t"><span class="icon">📋</span> 核销记录</div>
+          <div class="hf">
+            <div class="fg"><label>开始日期</label><input type="date" id="hb"></div>
+            <div class="fg"><label>结束日期</label><input type="date" id="he"></div>
+            <div class="fg" style="flex:1;min-width:120px"><label>搜索</label><input type="text" id="hk" placeholder="票号/检票码"></div>
+            <button class="btn bp bsm" onclick="loadHistory(1)">查询</button>
+          </div>
+          <div class="hstats" id="hstats">
+            <div class="hstat"><div class="sv" id="hs-total">0</div><div class="sl">核销总数</div></div>
+            <div class="hstat accent"><div class="sv" id="hs-today">0</div><div class="sl">今日核销</div></div>
+            <div class="hstat"><div class="sv" id="hs-persons">0</div><div class="sl">核销人数</div></div>
+          </div>
+          <div class="hl" id="hl"><div class="empty"><div class="ic">📋</div><p>点击查询加载核销记录</p></div></div>
+          <div class="hp hid" id="hp">
+            <button onclick="loadHistory(hPage-1)" id="hprev">上一页</button>
+            <span>第 <span class="pn" id="hpn">1</span> 页 / 共 <span id="hpt">1</span> 页</span>
+            <button onclick="loadHistory(hPage+1)" id="hnext">下一页</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="tst"></div>
+
+<!-- Fullscreen Scan Overlay -->
+<div class="scan-overlay" id="scanOv">
+  <video id="sv" autoplay playsinline muted></video>
+  <canvas id="sc"></canvas>
+  <div class="scan-frame"></div>
+  <div class="scan-hint">将二维码放入框内，自动识别</div>
+  <button class="scan-close" onclick="stopCam()">✕</button>
+</div>
+
+<script>
+// MD5 (Joseph Myers) - verified correct, no CDN
+var md5=(function(){var hc='0123456789abcdef';function rhex(n){var s='',j;for(j=0;j<4;j++)s+=hc.charAt((n>>(j*8+4))&0x0F)+hc.charAt((n>>(j*8))&0x0F);return s}function add32(a,b){return(a+b)&0xFFFFFFFF}function cmn(q,a,b,x,s,t){a=add32(a,add32(add32(q,x),t));return add32((a<<s)|(a>>>(32-s)),b)}function ff(a,b,c,d,x,s,t){return cmn((b&c)|((~b)&d),a,b,x,s,t)}function gg(a,b,c,d,x,s,t){return cmn((b&d)|(c&(~d)),a,b,x,s,t)}function hh(a,b,c,d,x,s,t){return cmn(b^c^d,a,b,x,s,t)}function ii(a,b,c,d,x,s,t){return cmn(c^(b|(~d)),a,b,x,s,t)}function cyc(x,k){var a=x[0],b=x[1],c=x[2],d=x[3];a=ff(a,b,c,d,k[0],7,-680876936);d=ff(d,a,b,c,k[1],12,-389564586);c=ff(c,d,a,b,k[2],17,606105819);b=ff(b,c,d,a,k[3],22,-1044525330);a=ff(a,b,c,d,k[4],7,-176418897);d=ff(d,a,b,c,k[5],12,1200080426);c=ff(c,d,a,b,k[6],17,-1473231341);b=ff(b,c,d,a,k[7],22,-45705983);a=ff(a,b,c,d,k[8],7,1770035416);d=ff(d,a,b,c,k[9],12,-1958414417);c=ff(c,d,a,b,k[10],17,-42063);b=ff(b,c,d,a,k[11],22,-1990404162);a=ff(a,b,c,d,k[12],7,1804603682);d=ff(d,a,b,c,k[13],12,-40341101);c=ff(c,d,a,b,k[14],17,-1502002290);b=ff(b,c,d,a,k[15],22,1236535329);a=gg(a,b,c,d,k[1],5,-165796510);d=gg(d,a,b,c,k[6],9,-1069501632);c=gg(c,d,a,b,k[11],14,643717713);b=gg(b,c,d,a,k[0],20,-373897302);a=gg(a,b,c,d,k[5],5,-701558691);d=gg(d,a,b,c,k[10],9,38016083);c=gg(c,d,a,b,k[15],14,-660478335);b=gg(b,c,d,a,k[4],20,-405537848);a=gg(a,b,c,d,k[9],5,568446438);d=gg(d,a,b,c,k[14],9,-1019803690);c=gg(c,d,a,b,k[3],14,-187363961);b=gg(b,c,d,a,k[8],20,1163531501);a=gg(a,b,c,d,k[13],5,-1444681467);d=gg(d,a,b,c,k[2],9,-51403784);c=gg(c,d,a,b,k[7],14,1735328473);b=gg(b,c,d,a,k[12],20,-1926607734);a=hh(a,b,c,d,k[5],4,-378558);d=hh(d,a,b,c,k[8],11,-2022574463);c=hh(c,d,a,b,k[11],16,1839030562);b=hh(b,c,d,a,k[14],23,-35309556);a=hh(a,b,c,d,k[1],4,-1530992060);d=hh(d,a,b,c,k[4],11,1272893353);c=hh(c,d,a,b,k[7],16,-155497632);b=hh(b,c,d,a,k[10],23,-1094730640);a=hh(a,b,c,d,k[13],4,681279174);d=hh(d,a,b,c,k[0],11,-358537222);c=hh(c,d,a,b,k[3],16,-722521979);b=hh(b,c,d,a,k[6],23,76029189);a=hh(a,b,c,d,k[9],4,-640364487);d=hh(d,a,b,c,k[12],11,-421815835);c=hh(c,d,a,b,k[15],16,530742520);b=hh(b,c,d,a,k[2],23,-995338651);a=ii(a,b,c,d,k[0],6,-198630844);d=ii(d,a,b,c,k[7],10,1126891415);c=ii(c,d,a,b,k[14],15,-1416354905);b=ii(b,c,d,a,k[5],21,-57434055);a=ii(a,b,c,d,k[12],6,1700485571);d=ii(d,a,b,c,k[3],10,-1894986606);c=ii(c,d,a,b,k[10],15,-1051523);b=ii(b,c,d,a,k[1],21,-2054922799);a=ii(a,b,c,d,k[8],6,1873313359);d=ii(d,a,b,c,k[15],10,-30611744);c=ii(c,d,a,b,k[6],15,-1560198380);b=ii(b,c,d,a,k[13],21,1309151649);a=ii(a,b,c,d,k[4],6,-145523070);d=ii(d,a,b,c,k[11],10,-1120210379);c=ii(c,d,a,b,k[2],15,718787259);b=ii(b,c,d,a,k[9],21,-343485551);x[0]=add32(a,x[0]);x[1]=add32(b,x[1]);x[2]=add32(c,x[2]);x[3]=add32(d,x[3])}function blk(s){var bl=[],i;for(i=0;i<64;i+=4)bl[i>>2]=s.charCodeAt(i)+(s.charCodeAt(i+1)<<8)+(s.charCodeAt(i+2)<<16)+(s.charCodeAt(i+3)<<24);return bl}return function(s){var n=s.length,st=[1732584193,-271733879,-1732584194,271733878],i,tail,lo,hi;for(i=64;i<=n;i+=64)cyc(st,blk(s.substring(i-64,i)));s=s.substring(i-64);tail=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];for(i=0;i<s.length;i++)tail[i>>2]|=s.charCodeAt(i)<<((i%4)<<3);tail[i>>2]|=0x80<<((i%4)<<3);if(i>55){cyc(st,tail);tail=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}tail[14]=n*8;cyc(st,tail);return rhex(st[0])+rhex(st[1])+rhex(st[2])+rhex(st[3])}})();
+
+// ====== Background Effects (静态背景) ======
+// 鸟和花瓣效果已移除动画
+
+// ====== Tab Switching ======
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===name));
+  document.getElementById('tab-scan').classList.toggle('hid',name!=='scan');
+  document.getElementById('tab-history').classList.toggle('hid',name!=='history');
+  if(name==='history'){syncDates();if(hData.length===0)loadHistory(1)}
+}
+
+// ====== App Logic ======
+const TH="http://tour.ip239.com",SH="https://saas.ip239.com";
+let tk="",pj=[],tks=[],managerInfo=null;
+let hData=[],hPage=1,hTotal=0,hPages=1;
+const HPAGE_SIZE=20;
+
+// ---- Login ----
+function doLogin(){
+  try{
+  const un=document.getElementById("lun").value.trim();
+  const pw=document.getElementById("lpw").value;
+  if(!un)return msg("请输入用户名","err");
+  if(!pw)return msg("请输入密码","err");
+  const btn=document.getElementById("lbtn");btn.disabled=true;btn.textContent="登录中...";
+  const pwdMd5=md5(pw);
+  fetch(`${SH}/Api/LoginUser?`,{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({UserName:un,PassWord:pwdMd5,PlatformType:0,OrganId:null})
+  }).then(r=>r.json()).then(d=>{
+    const info=d.data||d;
+    if(info&&info.Token){
+      tk=info.Token;managerInfo=info;
+      if(document.getElementById("lrm").checked){
+        localStorage.setItem("st_un",un);localStorage.setItem("st_pw",pwdMd5);localStorage.setItem("st_rm","1");
+      }else{localStorage.removeItem("st_un");localStorage.removeItem("st_pw");localStorage.removeItem("st_rm")}
+      localStorage.setItem("st_tk",tk);onLoginOk(info);
+    }else{msg(d.resultcontent||d.message||"登录失败","err")}
+  }).catch(e=>{msg("网络错误: "+e.message,"err")}).finally(()=>{btn.disabled=false;btn.textContent="登 录"});
+  }catch(e){msg("登录出错: "+e.message,"err");document.getElementById("lbtn").disabled=false;document.getElementById("lbtn").textContent="登 录"}
+}
+function onLoginOk(d){
+  document.getElementById("lc").classList.add("hid");
+  document.getElementById("main").classList.remove("hid");
+  const ui=document.getElementById("ui");
+  ui.innerHTML=`<span class="dot"></span>${d.NickName||d.UserName||""} · ${d.OrganName||""}<span class="logout" onclick="doLogout()">退出</span>`;
+  ui.classList.add("on");
+  syncDates();
+  loadP();preloadCamLib();msg("登录成功 · 欢迎回来","ok");
+}
+function doLogout(){
+  tk="";managerInfo=null;localStorage.removeItem("st_tk");
+  document.getElementById("lc").classList.remove("hid");
+  document.getElementById("main").classList.add("hid");
+  const ui=document.getElementById("ui");ui.innerHTML='<span class="dot"></span>未登录';ui.classList.remove("on");
+  document.getElementById("lun").value="";document.getElementById("lpw").value="";
+  hData=[];hPage=1;
+}
+function tryAutoLogin(){
+  const rm=localStorage.getItem("st_rm");
+  if(rm==="1"){
+    const un=localStorage.getItem("st_un"),pw=localStorage.getItem("st_pw");
+    if(un&&pw){
+      document.getElementById("lun").value=un;document.getElementById("lpw").value="••••••";
+      const btn=document.getElementById("lbtn");btn.disabled=true;btn.textContent="自动登录...";
+      fetch(`${SH}/Api/LoginUser?`,{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({UserName:un,PassWord:pw,PlatformType:0,OrganId:null})
+      }).then(r=>r.json()).then(d=>{
+        const info=d.data||d;
+        if(info&&info.Token){tk=info.Token;managerInfo=info;localStorage.setItem("st_tk",tk);onLoginOk(info)}
+        else{msg("自动登录失败，请重新登录","wrn");localStorage.removeItem("st_rm")}
+      }).catch(()=>{msg("自动登录失败","err");localStorage.removeItem("st_rm")})
+      .finally(()=>{btn.disabled=false;btn.textContent="登 录"});
+      return;
+    }
+  }
+  const savedTk=localStorage.getItem("st_tk");
+  if(savedTk){
+    tk=savedTk;
+    ap("/Api/GetMyDocument").then(d=>{
+      if(d.resultcode==="200"){managerInfo=d.data;onLoginOk({NickName:d.data.NickName,UserName:d.data.UserName,OrganName:d.data.OrganName})}
+      else{localStorage.removeItem("st_tk");tk=""}
+    }).catch(()=>{localStorage.removeItem("st_tk");tk=""});
+  }
+}
+
+// ---- API ----
+async function ap(p,b={}){
+  const u=`${TH}${p}?Token=${encodeURIComponent(tk)}`;
+  const r=await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});
+  const d=await r.json();
+  if(d.resultcode==="502"){msg("登录已过期，请重新登录","err");doLogout()}
+  return d;
+}
+
+// ---- Projects ----
+async function loadP(){
+  const d=await ap("/DGApi/SearchPlayProject",{SearchType:10});
+  if(d.resultcode==="200"){pj=d.data||[];const s=document.getElementById("ps");s.innerHTML=pj.map(p=>`<option value="${p.Id}">${p.Name}</option>`).join("")}
+}
+
+// ---- Camera (getUserMedia + jsQR, fullscreen overlay) ----
+let _stream=null,_raf=0,jsQR=null;
+
+function loadJsqR(){
+  return new Promise((res,rej)=>{
+    if(jsQR)return res(true);
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+    s.onload=()=>{jsQR=window.jsQR||null;res(!!jsQR)};
+    s.onerror=()=>{msg("扫码库加载失败，请检查网络","err");res(false)};
+    document.head.appendChild(s);
+  });
+}
+// preload after login
+function preloadCamLib(){loadJsqR()}
+loadJsqR();
+
+async function stopCam(){
+  cancelAnimationFrame(_raf);_raf=0;
+  if(_stream){_stream.getTracks().forEach(t=>t.stop());_stream=null}
+  document.getElementById('scanOv').classList.remove('on');
+  document.getElementById('cb').textContent="📷 扫码检票";
+}
+
+function _onScanResult(text){
+  document.getElementById('ci').value=text;
+  stopCam();
+  search();
+}
+
+function _scanFrame(){
+  if(!_stream)return;
+  const video=document.getElementById('sv');
+  const canvas=document.getElementById('sc');
+  if(video.readyState>=2){
+    const w=video.videoWidth,h=video.videoHeight;
+    if(w&&h){
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(video,0,0,w,h);
+      const img=ctx.getImageData(0,0,w,h);
+      const code=jsQR(img.data,w,h,{inversionAttempts:'dontInvert'});
+      if(code&&code.data){_onScanResult(code.data);return}
+    }
+  }
+  _raf=requestAnimationFrame(_scanFrame);
+}
+
+async function togCam(){
+  if(document.getElementById('scanOv').classList.contains('on')){stopCam();return}
+  if(!jsQR){const ok=await loadJsqR();if(!ok)return}
+  const btn=document.getElementById('cb');btn.textContent="加载中...";
+  try{
+    _stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}
+    });
+    const video=document.getElementById('sv');
+    video.srcObject=_stream;
+    await video.play();
+    document.getElementById('scanOv').classList.add('on');
+    btn.textContent="📷 扫码中...";
+    _raf=requestAnimationFrame(_scanFrame);
+  }catch(e){msg("无法访问摄像头: "+e.message,"err");stopCam()}
+}
+
+// ---- Scanner gun ----
+let buf="",bt=null;
+document.addEventListener("keydown",e=>{
+  if(document.activeElement===document.getElementById("ci")||document.activeElement===document.getElementById("lun")||document.activeElement===document.getElementById("lpw")||document.activeElement===document.getElementById("hk"))return;
+  if(e.key==="Enter"){if(buf.length>3){document.getElementById("ci").value=buf;search()}buf="";clearTimeout(bt);return}
+  if(e.key.length===1){buf+=e.key;clearTimeout(bt);bt=setTimeout(()=>{buf=""},100)}
+});
+
+// ---- Search ----
+async function search(){
+  const c=document.getElementById("ci").value.trim();
+  if(!c)return msg("请输入检票码","wrn");
+  if(!tk)return msg("请先登录","err");
+  const b=document.getElementById("sb");b.disabled=true;b.textContent="查询中...";
+  try{
+    let d=await ap("/OrderDetail/GetPage",{PageIndex:1,PageSize:50,CheckCode:c,BeginTime:gd(-30)+" 00:00:00",EndTime:gd(1)+" 23:59:59",GetState:"",IsGetTicked:"0",PlaceManagerId:"",TickId:""});
+    if(!d.data||d.data.length===0)d=await ap("/OrderDetail/GetPage",{PageIndex:1,PageSize:50,TickNo:c,BeginTime:gd(-30)+" 00:00:00",EndTime:gd(1)+" 23:59:59",GetState:"",IsGetTicked:"0",PlaceManagerId:"",TickId:""});
+    if(d.resultcode==="200"&&d.data&&d.data.length>0){
+      const f=d.data[0];
+      if(f.OrderId&&d.data.length<=1){
+        const o=await ap("/OrderDetail/GetPage",{PageIndex:1,PageSize:50,OrderId:f.OrderId,BeginTime:gd(-30)+" 00:00:00",EndTime:gd(1)+" 23:59:59",GetState:"",IsGetTicked:"0",PlaceManagerId:"",TickId:""});
+        if(o.resultcode==="200"&&o.data&&o.data.length>0)tks=o.data;else tks=d.data;
+      }else tks=d.data;
+      render();document.getElementById("rc").classList.remove("hid");
+      document.getElementById("oinf").textContent=`订单 ${tks[0].OrderId||""} · 共 ${tks.length} 张`;
+    }else{tks=[];render();document.getElementById("rc").classList.remove("hid");document.getElementById("oinf").textContent="";msg("未找到相关票据","wrn")}
+  }catch(e){msg("查询失败: "+e.message,"err")}finally{b.disabled=false;b.textContent="查询"}
+}
+
+const SM={"0":"预定","1":"已取","2":"已检","3":"已废","4":"已退","5":"已改签"};
+function render(){
+  const l=document.getElementById("tl");
+  if(!tks.length){l.innerHTML='<div class="empty"><div class="ic">🎫</div><p>暂无票据</p></div>';upSC();return}
+  l.innerHTML=tks.map((t,i)=>`<div class="ti"><input type="checkbox" class="tc" data-i="${i}" ${t.GetState==2||t.GetState==3||t.GetState==4?"disabled":""} onchange="upSC()"><div class="tf"><div class="tn">${t.TickName||"未知票种"}</div><div class="tm"><span>票号: ${t.TickNo||"-"}</span><span>${t.UserName||""}</span><span>${t.UserCertNo||""}</span>${t.PersonCount?`<span>${t.PersonCount}人</span>`:""}</div></div><span class="ts s${t.GetState}">${SM[t.GetState]||"未知"}</span></div>`).join("");
+  upSC();
+}
+function togAll(){const c=document.getElementById("sa2").checked;document.querySelectorAll(".tc:not(:disabled)").forEach(x=>{x.checked=c});upSC()}
+function upSC(){const n=document.querySelectorAll(".tc:checked").length;document.getElementById("sc2").textContent=n;document.getElementById("vb").disabled=n===0}
+
+// ---- Verify ----
+async function batchV(){
+  const ck=document.querySelectorAll(".tc:checked");if(!ck.length)return;
+  const b=document.getElementById("vb");b.disabled=true;b.textContent="核销中...";
+  let ok=0,fail=0;const pid=document.getElementById("ps").value,dir=parseInt(document.getElementById("ds").value);
+  const vt=[];
+  for(const c of ck){
+    const i=parseInt(c.dataset.i),t=tks[i];
+    try{
+      const r=await ap("/Api/CheckTick",{ProjectId:pid,TickNo:t.CheckCode||t.TickNo,CodeType:-1,ProjectType:0,TickCount:t.PersonCount?String(t.PersonCount):"1",Direction:dir,EquipmentName:"核销终端"});
+      if(r.resultcode==="200"||r.resultcode==="0"||r.resultcode==="2"){
+        ok++;t.GetState=2;
+        vt.push({TickName:t.TickName||"未知票种",TickNo:t.TickNo||"",CheckCode:t.CheckCode||"",OrderId:t.OrderId||"",UserName:t.UserName||"",PersonCount:t.PersonCount||1,Direction:dir,CheckTime:new Date().toLocaleString("zh-CN"),Operator:managerInfo?managerInfo.NickName||managerInfo.UserName||"":"",ProjectName:pj.find(p=>p.Id===pid)?pj.find(p=>p.Id===pid).Name:""});
+      }else{fail++}
+    }catch(e){fail++}
+  }
+  render();
+  if(vt.length>0)saveLocalRecords(vt);
+  if(ok>0){showBurst();msg(`成功核销 ${ok} 张票${fail>0?"，"+fail+" 张失败":""}`,ok>0&&fail===0?"ok":"wrn")}
+  else msg("核销失败","err");
+  b.textContent="批量核销";
+  if(!document.getElementById("tab-history").classList.contains("hid"))loadHistory(hPage);
+}
+
+// ====== HISTORY ======
+function getLocalRecords(){try{return JSON.parse(localStorage.getItem("v_records")||"[]")}catch{return[]}}
+function saveLocalRecords(tickets){
+  const recs=getLocalRecords();
+  const today=gd(0);
+  // 按日期过滤：只保留今天的记录（第二天重新开始）
+  const todayRecs=recs.filter(r=>r.CheckTime&&r.CheckTime.startsWith(today));
+  // 今天的数据继续累加，新来的记录追加到今天的数据后面
+  todayRecs.push(...tickets);
+  localStorage.setItem("v_records",JSON.stringify(todayRecs));
+}
+
+async function loadHistory(page){
+  if(!tk)return msg("请先登录","err");
+  hPage=page||1;
+  const beg=document.getElementById("hb").value||gd(0);
+  const end=document.getElementById("he").value||gd(0);
+  const kw=document.getElementById("hk").value.trim();
+  const hl=document.getElementById("hl");
+  hl.innerHTML='<div class="empty"><div class="ic">⏳</div><p>加载中...</p></div>';
+  try{
+    const params={PageIndex:hPage,PageSize:HPAGE_SIZE,BeginTime:beg+" 00:00:00",EndTime:end+" 23:59:59"};
+    if(kw)params.CheckCode=kw;
+    const d=await ap("/CheckTicket/GetPage",params);
+    if(d.resultcode==="200"&&d.data){
+      hData=d.data.list||d.data||[];hTotal=d.data.total||d.data.Total||hData.length;hPages=Math.ceil(hTotal/HPAGE_SIZE)||1;
+      renderHistory(hData);updateStats(d.data);
+    }else{
+      const params2={PageIndex:hPage,PageSize:HPAGE_SIZE,BeginTime:beg+" 00:00:00",EndTime:end+" 23:59:59",GetState:"2",IsGetTicked:"0"};
+      if(kw){params2.CheckCode=kw;params2.TickNo=kw}
+      const d2=await ap("/OrderDetail/GetPage",params2);
+      if(d2.resultcode==="200"&&d2.data){
+        hData=d2.data||[];hTotal=d2.total||hData.length;hPages=Math.ceil(hTotal/HPAGE_SIZE)||1;
+        renderHistoryFromOrderDetail(hData);updateStatsFromLocal(beg,end);
+      }else{renderLocalHistory(beg,end,kw)}
+    }
+  }catch(e){renderLocalHistory(beg,end,kw)}
+}
+
+function renderHistory(data){
+  const hl=document.getElementById("hl");
+  if(!data||!data.length){hl.innerHTML='<div class="empty"><div class="ic">📋</div><p>该时段暂无核销记录</p></div>';document.getElementById("hp").classList.add("hid");return}
+  hl.innerHTML=data.map((r,i)=>`<div class="hi"><div class="hi-left">${r.Direction===0?"📤":"📥"}</div><div class="hi-body"><div class="hi-name">${r.TickName||r.OrderDetailName||"未知票种"}</div><div class="hi-meta"><span>票号: ${r.TickNo||r.CheckCode||"-"}</span>${r.UserName?`<span>${r.UserName}</span>`:""}${r.PersonCount?`<span>${r.PersonCount}人</span>`:""}<span class="dir-badge ${r.Direction===0?'dir-out':'dir-in'}">${r.Direction===0?"出":"进"}</span></div><div class="hi-time">${r.CheckTime||r.CreateTime||r.GetTickTime||""} · ${r.EquipmentName||r.OperatorName||""}</div></div></div>`).join("");
+  renderPagination();
+}
+function renderHistoryFromOrderDetail(data){
+  const hl=document.getElementById("hl");
+  if(!data||!data.length){hl.innerHTML='<div class="empty"><div class="ic">📋</div><p>该时段暂无核销记录</p></div>';document.getElementById("hp").classList.add("hid");return}
+  hl.innerHTML=data.map((r,i)=>`<div class="hi"><div class="hi-left">✅</div><div class="hi-body"><div class="hi-name">${r.TickName||"未知票种"}</div><div class="hi-meta"><span>票号: ${r.TickNo||"-"}</span><span>检票码: ${r.CheckCode||"-"}</span>${r.UserName?`<span>${r.UserName}</span>`:""}${r.PersonCount?`<span>${r.PersonCount}人</span>`:""}<span class="ts s2">已检</span></div><div class="hi-time">${r.GetTickTime||r.UpdateTime||""} · 订单 ${r.OrderId||""}</div></div></div>`).join("");
+  renderPagination();
+}
+function renderLocalHistory(beg,end,kw){
+  let recs=getLocalRecords();
+  if(beg)recs=recs.filter(r=>r.CheckTime>=beg);
+  if(end)recs=recs.filter(r=>r.CheckTime<=end+" 23:59:59");
+  if(kw)recs=recs.filter(r=>(r.TickNo&&r.TickNo.includes(kw))||(r.CheckCode&&r.CheckCode.includes(kw)));
+  hTotal=recs.length;hPages=Math.ceil(hTotal/HPAGE_SIZE)||1;
+  if(hPage>hPages)hPage=hPages;
+  const start=(hPage-1)*HPAGE_SIZE,pageData=recs.slice(start,start+HPAGE_SIZE);
+  const hl=document.getElementById("hl");
+  if(!pageData.length){hl.innerHTML='<div class="empty"><div class="ic">📋</div><p>暂无本地核销记录</p></div>';document.getElementById("hp").classList.add("hid");document.getElementById("hs-total").textContent="0";document.getElementById("hs-today").textContent="0";document.getElementById("hs-persons").textContent="0";return}
+  hl.innerHTML=pageData.map((r,i)=>`<div class="hi"><div class="hi-left">${r.Direction===0?"📤":"📥"}</div><div class="hi-body"><div class="hi-name">${r.TickName||"未知票种"}</div><div class="hi-meta"><span>票号: ${r.TickNo||"-"}</span>${r.UserName?`<span>${r.UserName}</span>`:""}${r.PersonCount?`<span>${r.PersonCount}人</span>`:""}<span class="dir-badge ${r.Direction===0?'dir-out':'dir-in'}">${r.Direction===0?"出":"进"}</span></div><div class="hi-time">${r.CheckTime||""} · ${r.Operator||""} ${r.ProjectName?"· "+r.ProjectName:""}</div></div></div>`).join("");
+  updateStatsFromLocal(beg,end);renderPagination();
+}
+function updateStats(data){
+  document.getElementById("hs-total").textContent=data.total||data.Total||0;
+  const today=gd(0);const lr=getLocalRecords().filter(r=>r.CheckTime&&r.CheckTime.startsWith(today));
+  document.getElementById("hs-today").textContent=lr.length;
+  document.getElementById("hs-persons").textContent=lr.reduce((s,r)=>s+(r.PersonCount||1),0);
+}
+function updateStatsFromLocal(beg,end){
+  let recs=getLocalRecords();const today=gd(0);
+  const todayRecs=recs.filter(r=>r.CheckTime&&r.CheckTime.startsWith(today));
+  document.getElementById("hs-total").textContent=recs.length;
+  document.getElementById("hs-today").textContent=todayRecs.length;
+  document.getElementById("hs-persons").textContent=todayRecs.reduce((s,r)=>s+(r.PersonCount||1),0);
+}
+function renderPagination(){
+  const p=document.getElementById("hp");
+  if(hPages<=1){p.classList.add("hid");return}
+  p.classList.remove("hid");
+  document.getElementById("hpn").textContent=hPage;
+  document.getElementById("hpt").textContent=hPages;
+  document.getElementById("hprev").disabled=hPage<=1;
+  document.getElementById("hnext").disabled=hPage>=hPages;
+}
+
+// ====== UTILS ======
+function showBurst(){const el=document.createElement('div');el.className='success-burst';el.innerHTML='<div class="ring"></div>';document.body.appendChild(el);setTimeout(()=>el.remove(),1000)}
+function gd(o){const d=new Date();d.setDate(d.getDate()+o);const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+dd}
+function syncDates(){document.getElementById("hb").value=gd(0);document.getElementById("he").value=gd(0)}
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&tk)syncDates()});
+let tt;function msg(m,t="ok"){const e=document.getElementById("tst");e.textContent=m;e.className=`toast ${t} show`;clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2500)}
+
+document.getElementById("ci").addEventListener("keydown",e=>{if(e.key==="Enter")search()});
+document.getElementById("hk").addEventListener("keydown",e=>{if(e.key==="Enter")loadHistory(1)});
+document.getElementById("lpw").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
+document.getElementById("lun").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("lpw").focus()});
+
+tryAutoLogin();
+</script>
+</body>
+</html>
